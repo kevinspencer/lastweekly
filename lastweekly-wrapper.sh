@@ -2,4 +2,4 @@
 
 LFM_API_KEY=$(<.lastfm.token); export LFM_API_KEY
 
-./tweekly.pl --user kevinspencer --twitter
+./lastweekly.pl --user kevinspencer --twitter
