@@ -26,14 +26,14 @@ use URI;
 use strict;
 use warnings;
 
-our $VERSION = '0.6';
+our $VERSION = '0.7';
 
 $Data::Dumper::Indent = 1;
 
 my ($artists_to_count, $lastfm_user, $force, $twitter, $debug);
 GetOptions("count=i" => \$artists_to_count, "user=s" => \$lastfm_user, "twitter" => \$twitter, "debug" => \$debug, "force" => \$force);
 
-die "No user provided, USAGE: tweekly.pl --user oldmanrivers\n" if (! $lastfm_user);
+die "No user provided, USAGE: lastweekly.pl --user oldmanrivers\n" if (! $lastfm_user);
 
 $artists_to_count ||= 5;
 
@@ -60,7 +60,7 @@ my %params = (
 $uri->query_form(%params);
 
 my $ua = LWP::UserAgent->new();
-$ua->agent('tweekly.pl/' . $VERSION);
+$ua->agent('lastweekly.pl/' . $VERSION);
 my $response = $ua->get($uri);
 if (! $response->is_success()) {
     die "Error when communicating with $api_url: " . $response->status_line(), "\n";
@@ -88,7 +88,7 @@ for my $artist (@$artists) {
     last if ($counter == $artists_to_count);
 }
 
-$twitter_post_string .= " via tweekly.pl";
+$twitter_post_string .= " via lastweekly";
 
 print $twitter_post_string, "\n";
 
