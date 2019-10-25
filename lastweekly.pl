@@ -26,7 +26,7 @@ use URI;
 use strict;
 use warnings;
 
-our $VERSION = '0.7';
+our $VERSION = '0.8';
 
 $Data::Dumper::Indent = 1;
 
@@ -73,7 +73,7 @@ if ($data->{error}) {
 
 my $artists = $data->{topartists}{artist};
 
-my $twitter_post_string = 'My top ' . $artists_to_count . ' #lastfm artists: ';
+my $twitter_post_string = "Who did I listen to most this week?  #lastfm says: ";
 
 my $counter = 0;
 for my $artist (@$artists) {
