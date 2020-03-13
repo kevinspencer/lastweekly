@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Copyright 2018-2019 Kevin Spencer <kevin@kevinspencer.org>
+# Copyright 2018-2020 Kevin Spencer <kevin@kevinspencer.org>
 #
 # Permission to use, copy, modify, distribute, and sell this software and its
 # documentation for any purpose is hereby granted without fee, provided that
@@ -26,7 +26,7 @@ use URI;
 use strict;
 use warnings;
 
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 $Data::Dumper::Indent = 1;
 
@@ -88,7 +88,7 @@ for my $artist (@$artists) {
     last if ($counter == $artists_to_count);
 }
 
-$twitter_post_string .= " via lastweekly";
+$twitter_post_string .= " via #lastweekly.  https://www.last.fm/user/kevinspencer";
 
 print $twitter_post_string, "\n";
 
