@@ -88,7 +88,7 @@ for my $artist (@$artists) {
     last if ($counter == $artists_to_count);
 }
 
-$twitter_post_string .= " via #lastweekly.  https://www.last.fm/user/kevinspencer";
+$twitter_post_string .= " via #lastweekly.  https://www.last.fm/user/" . $lastfm_user;
 
 print $twitter_post_string, "\n";
 
