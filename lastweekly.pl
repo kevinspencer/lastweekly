@@ -26,7 +26,7 @@ use URI;
 use strict;
 use warnings;
 
-our $VERSION = '0.9';
+our $VERSION = '0.10';
 
 $Data::Dumper::Indent = 1;
 
