@@ -144,3 +144,65 @@ if ($result->{id}) {
     print "SUCCESS: post sent to Twitter, ID: $result->{id}\n";
 }
 
+sub get_twitter_authorization {
+    my $request = $client->oauth_request_token();
+
+    my $auth_url = $client->oauth_authorization_url({ oauth_token => $request->{oauth_token} });
+
+    print "Visit the following URL in your browser to authorize this app:\n" .
+        $client->oauth_authorization_url( { oauth_token => $request->{oauth_token} } ) . "\n";
+
+    my $pin = prompt("Once done, enter the PIN here: ");
+
+    try {
+        print "PIN received, contacting twitter to obtain access tokens...\n";
+        my $access = $client->oauth_access_token({
+            token        => $request->{oauth_token},
+            token_secret => $request->{oauth_token_secret},
+            verifier     => $pin
+        });
+
+        my ($access_token, $access_token_secret) = @{$access}{qw(oauth_token oauth_token_secret)};
+
+        if ($access_token && $access_token_secret) {
+            print "Tokens received, storing to $tokens_file...\n";
+            store_tokens($access_token, $access_token_secret);
+            print "Done.\n";
+            return ($access_token, $access_token_secret);
+        } else {
+            print "Twitter error: did not receive access tokens.\n";
+            return;
+        }
+    }
+    catch {
+        die $_ unless is_twitter_api_error($_);
+
+        print $_->http_request->as_string;
+        print $_->http_response->as_string;
+        print $_->twitter_error_code;
+    }
+}
+
+sub retrieve_tokens {
+    if (-e $tokens_file) {
+        open(my $fh, '<', $tokens_file) ||
+            die "Could not read $tokens_file - $!\n";
+        my $a_token = <$fh>;
+        chomp($a_token);
+        my $a_secret = <$fh>;
+        chomp($a_secret);
+        close($fh);
+        return ($a_token, $a_secret);
+    }
+    return;
+}
+
+sub store_tokens {
+    my ($a_token, $a_token_secret) = @_;
+
+    open(my $fh, '>', $tokens_file) ||
+        die "Could not create $tokens_file - $!\n";
+    print $fh $a_token, "\n";
+    print $fh $a_token_secret, "\n";
+    close($fh);
+}
