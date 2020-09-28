@@ -86,3 +86,61 @@ for my $artist (@$artists) {
 $twitter_post_string .= " via #lastweekly.  https://www.last.fm/user/" . $lastfm_user;
 
 print $twitter_post_string, "\n";
+
+#
+# Twitter logic from here on down
+#
+
+my $tokens_file = File::Spec->catfile(File::HomeDir->my_home(), '.burdie_tokens');
+
+#
+# consumer_key and consumer_secret are provided by twitter on app registration.
+# twitter uses these to identify the app in question.  not ideal to hardcode
+# these here but no real choice thanks to the odd implementation of OAuth by twitter.
+# see:
+#
+# http://arstechnica.com/security/2010/09/twitter-a-case-study-on-how-to-do-oauth-wrong/
+#
+
+my $consumer_key    = 'supflerNwc0EZGHugqjtSA';
+my $consumer_secret = 'nOJ5EAkNW7bG7TUEpVUD1N6AQIfnMpEWIGsaSZ9BJYM';
+
+my $client = Twitter::API->new_with_traits(
+    traits              => [ qw/Migration ApiMethods RetryOnError/ ],
+    consumer_key        => $consumer_key,
+    consumer_secret     => $consumer_secret,
+);
+
+#
+# access_token and access_token_secret are given on a per-user basis by twitter
+# once the user has authorized burdie access to their account.  if we've been
+# authorized before, there should be access tokens on disk...
+#
+my($access_token, $access_token_secret) = retrieve_tokens();
+if (! ($access_token && $access_token_secret)) {
+    ($access_token, $access_token_secret) = get_twitter_authorization();
+}
+
+$client->access_token($access_token);
+$client->access_token_secret($access_token_secret);
+
+try {
+    my $r = $client->verify_credentials;
+}
+catch {
+    die $_ unless is_twitter_api_error($_);
+
+    print $_->http_request->as_string;
+    print $_->http_response->as_string;
+    print 'No use retrying right away' if $_->is_permanent_error;
+    if ( $_->is_token_error ) {
+        print "There's something wrong with this token."
+    }
+    print $_->twitter_error_code;
+};
+
+my $result = $client->update($twitter_post_string);
+if ($result->{id}) {
+    print "SUCCESS: post sent to Twitter, ID: $result->{id}\n";
+}
+
