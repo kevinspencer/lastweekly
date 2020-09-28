@@ -16,17 +16,21 @@
 ################################################################################
 
 use Data::Dumper;
-use Env '@PATH';
 use File::HomeDir;
+use File::Spec;
 use File::stat;
 use Getopt::Long;
+use IO::Prompt;
 use JSON::XS;
 use LWP::UserAgent;
+use Try::Tiny;
+use Twitter::API;
+use Twitter::API::Util 'is_twitter_api_error';
 use URI;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 $Data::Dumper::Indent = 1;
 
@@ -36,15 +40,6 @@ GetOptions("count=i" => \$artists_to_count, "user=s" => \$lastfm_user, "twitter"
 die "No user provided, USAGE: lastweekly.pl --user oldmanrivers\n" if (! $lastfm_user);
 
 $artists_to_count ||= 5;
-
-my $twitter_poster = 'burdie';
-# if we're posting to twitter, ensure burdie is in our path
-if ($twitter) {
-    push(@PATH, File::HomeDir->my_home() . '/bin');
-    if (! grep -x "$_/$twitter_poster", @PATH) {
-        die "You wanted to post to Twitter but I can't find any tool to do that.\n";
-    }
-}
 
 my $api_key = $ENV{LFM_API_KEY} or die "No last.fm API key found\n";
 
@@ -91,10 +86,3 @@ for my $artist (@$artists) {
 $twitter_post_string .= " via #lastweekly.  https://www.last.fm/user/" . $lastfm_user;
 
 print $twitter_post_string, "\n";
-
-# TODO: instead of shelling out, incorporate burdie code here...
-if ($twitter) {
-    my $shell_command = "$twitter_poster \Q$twitter_post_string\E";
-    my $result = `$shell_command`;
-    print $result, "\n";
-}
