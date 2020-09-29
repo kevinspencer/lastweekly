@@ -9,3 +9,7 @@ A while back Scott was considering retiring tweekly.fm.  That would have been a 
 ### genesis
 
 In 2010 I wrote [toppr](https://github.com/kevinspencer/toppr) to post last.fm listening stats to a Movable Type based blog.  No one does that anymore, but that spark of an idea stuck with me.
+
+### dogfooding
+
+I've switched to using this in cron every Friday morning
