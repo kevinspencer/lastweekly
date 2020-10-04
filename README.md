@@ -1,6 +1,8 @@
 # lastweekly
 
-First a little preamble.  Go use tweekly.fm.  Really.  Scott (@ssxio) is a great guy and has put a lot of hard work into it.
+First a little preamble.  
+
+Go use tweekly.fm.  Really.  Scott (@ssxio) is a great guy and has put a lot of hard work into it.
 
 ### so why lastweekly?
 
