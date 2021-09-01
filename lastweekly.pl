@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Copyright 2018-2020 Kevin Spencer <kevin@kevinspencer.org>
+# Copyright 2018-2021 Kevin Spencer <kevin@kevinspencer.org>
 #
 # Permission to use, copy, modify, distribute, and sell this software and its
 # documentation for any purpose is hereby granted without fee, provided that
@@ -16,6 +16,7 @@
 ################################################################################
 
 use Data::Dumper;
+use Encode;
 use File::HomeDir;
 use File::Spec;
 use File::stat;
@@ -84,6 +85,8 @@ for my $artist (@$artists) {
 }
 
 $twitter_post_string .= " via #lastweekly.  https://www.last.fm/user/" . $lastfm_user;
+
+$twitter_post_string = encode_utf8($twitter_post_string);
 
 print $twitter_post_string, "\n";
 
