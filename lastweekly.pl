@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Copyright 2018-2021 Kevin Spencer <kevin@kevinspencer.org>
+# Copyright 2018-2024 Kevin Spencer <kevin@kevinspencer.org>
 #
 # Permission to use, copy, modify, distribute, and sell this software and its
 # documentation for any purpose is hereby granted without fee, provided that
@@ -25,24 +25,22 @@ use IO::Prompt;
 use JSON::XS;
 use LWP::UserAgent;
 use Try::Tiny;
-use Twitter::API;
-use Twitter::API::Util 'is_twitter_api_error';
 use URI;
+use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 $Data::Dumper::Indent = 1;
 
-my ($artists_to_count, $lastfm_user, $force, $twitter, $debug);
-GetOptions("count=i" => \$artists_to_count, "user=s" => \$lastfm_user, "twitter" => \$twitter, "debug" => \$debug, "force" => \$force);
+my ($artists_to_count, $lastfm_user, $force, $debug);
+GetOptions("count=i" => \$artists_to_count, "user=s" => \$lastfm_user, "debug" => \$debug, "force" => \$force);
 
-die "No user provided, USAGE: lastweekly.pl --user oldmanrivers\n" if (! $lastfm_user);
+my $lastfm_user = $ENV{LFM_USER_ID} or die "No last.fm username found\n";
+my $api_key     = $ENV{LFM_API_KEY} or die "No last.fm API key found\n";
 
 $artists_to_count ||= 5;
-
-my $api_key = $ENV{LFM_API_KEY} or die "No last.fm API key found\n";
 
 my $api_url = 'http://ws.audioscrobbler.com/2.0/';
 my $uri = URI->new($api_url);
