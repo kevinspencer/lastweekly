@@ -17,20 +17,15 @@
 
 use Data::Dumper;
 use Encode;
-use File::HomeDir;
-use File::Spec;
-use File::stat;
 use Getopt::Long;
-use IO::Prompt;
 use JSON::XS;
 use LWP::UserAgent;
-use Try::Tiny;
 use URI;
 use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 $Data::Dumper::Indent = 1;
 
