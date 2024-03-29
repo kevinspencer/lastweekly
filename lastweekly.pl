@@ -15,6 +15,7 @@
 #
 ################################################################################
 
+use Config::Tiny;
 use Data::Dumper;
 use Encode;
 use Getopt::Long;
@@ -25,24 +26,23 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 $Data::Dumper::Indent = 1;
 
 my ($artists_to_count, $force, $debug);
 GetOptions("count=i" => \$artists_to_count, "debug" => \$debug, "force" => \$force);
 
-my $lastfm_user = $ENV{LFM_USER_ID} or die "No last.fm username found\n";
-my $api_key     = $ENV{LFM_API_KEY} or die "No last.fm API key found\n";
+my $config = Config::Tiny->read('lastweekly.conf') || die "Could not read lastweekly.conf - $!\n";
 
 $artists_to_count ||= 5;
 
 my $api_url = 'http://ws.audioscrobbler.com/2.0/';
 my $uri = URI->new($api_url);
 my %params = (
-    api_key => $api_key,
+    api_key => $config->{lastfm}->{apikey},
     method  => 'user.getTopArtists',
-    user    => $lastfm_user,
+    user    => $config->{lastfm}->{user},
     period  => '7day',
     format  => 'json'
 );
