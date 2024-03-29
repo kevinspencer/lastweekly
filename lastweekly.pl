@@ -22,11 +22,12 @@ use Getopt::Long;
 use JSON::XS;
 use LWP::UserAgent;
 use URI;
+use WordPress::XMLRPC;
 use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 $Data::Dumper::Indent = 1;
 
@@ -82,3 +83,11 @@ $downstream_post_string .= ' [via <a href="https://github.com/kevinspencer/lastw
 $downstream_post_string = encode_utf8($downstream_post_string);
 
 print $downstream_post_string, "\n";
+
+my $wp = WordPress::XMLRPC->new({
+  username => $config->{wordpress}->{user},
+  password => $config->{wordpress}->{pass},
+  proxy    => $config->{wordpress}->{proxy}
+});
+
+$wp->newPost({title => '', description => $downstream_post_string});
