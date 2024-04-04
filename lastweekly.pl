@@ -31,8 +31,8 @@ our $VERSION = '0.18';
 
 $Data::Dumper::Indent = 1;
 
-my ($artists_to_count, $force, $debug);
-GetOptions("count=i" => \$artists_to_count, "debug" => \$debug, "force" => \$force);
+my ($artists_to_count, $draft, $debug);
+GetOptions("count=i" => \$artists_to_count, "debug" => \$debug, "draft" => \$draft);
 
 my $config = Config::Tiny->read('lastweekly.conf') || die "Could not read lastweekly.conf - $!\n";
 
@@ -82,7 +82,7 @@ $downstream_post_string .= ' [via <a href="https://github.com/kevinspencer/lastw
 
 $downstream_post_string = encode_utf8($downstream_post_string);
 
-print $downstream_post_string, "\n";
+print $downstream_post_string, "\n" if ($debug);
 
 my @posttags = qw(last.fm microblog);
 my $wpproxy = $config->{wordpress}->{proxy};
@@ -91,11 +91,13 @@ my $wppass   = $config->{wordpress}->{pass};
 my $blogid  = 1;
 my $wpcall  = 'metaWeblog.newPost';
 
+my $status = $draft ? 'draft' : 'publish';
+
 my $res = XMLRPC::Lite->proxy($wpproxy)->call($wpcall, $blogid, $wpuser, $wppass,
     {
         description       => $downstream_post_string,
         title             => '',
-        post_status       => 'draft',
+        post_status       => $status,
         mt_allow_comments => 1,
         mt_keywords       => \@posttags,
     }, 1)->result();
