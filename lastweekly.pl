@@ -22,12 +22,12 @@ use Getopt::Long;
 use JSON::XS;
 use LWP::UserAgent;
 use URI;
-use WordPress::XMLRPC;
+use XMLRPC::Lite;
 use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 $Data::Dumper::Indent = 1;
 
@@ -84,10 +84,19 @@ $downstream_post_string = encode_utf8($downstream_post_string);
 
 print $downstream_post_string, "\n";
 
-my $wp = WordPress::XMLRPC->new({
-  username => $config->{wordpress}->{user},
-  password => $config->{wordpress}->{pass},
-  proxy    => $config->{wordpress}->{proxy}
-});
+my @posttags = qw(last.fm microblog);
+my $wpproxy = $config->{wordpress}->{proxy};
+my $wpuser  = $config->{wordpress}->{user};
+my $wppass   = $config->{wordpress}->{pass};
+my $blogid  = 1;
+my $wpcall  = 'metaWeblog.newPost';
 
-$wp->newPost({title => '', description => $downstream_post_string});
+my $res = XMLRPC::Lite->proxy($wpproxy)->call($wpcall, $blogid, $wpuser, $wppass,
+    {
+        description       => $downstream_post_string,
+        title             => '',
+        post_status       => 'draft',
+        mt_allow_comments => 1,
+        mt_keywords       => \@posttags,
+    }, 1)->result();
+
