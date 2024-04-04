@@ -14,7 +14,7 @@ No. Twitter API changes broke all kinds of things and I didn't have the tuits to
 
 ### behold the Wordpress!
 
-The upcoming versions of lastweekly will support posting to Wordpress
+lastweekly now supports posting to Wordpress.
 
 ### genesis
 
