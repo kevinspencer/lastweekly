@@ -85,11 +85,11 @@ $downstream_post_string = encode_utf8($downstream_post_string);
 print $downstream_post_string, "\n" if ($debug);
 
 my @posttags = qw(last.fm microblog);
-my $wpproxy = $config->{wordpress}->{proxy};
-my $wpuser  = $config->{wordpress}->{user};
+my $wpproxy  = $config->{wordpress}->{proxy};
+my $wpuser   = $config->{wordpress}->{user};
 my $wppass   = $config->{wordpress}->{pass};
-my $blogid  = 1;
-my $wpcall  = 'metaWeblog.newPost';
+my $blogid   = 1;
+my $wpcall   = 'metaWeblog.newPost';
 
 my $status = $draft ? 'draft' : 'publish';
 
