@@ -27,12 +27,12 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 $Data::Dumper::Indent = 1;
 
-my ($artists_to_count, $draft, $debug);
-GetOptions("count=i" => \$artists_to_count, "debug" => \$debug, "draft" => \$draft);
+my ($artists_to_count, $draft, $debug, $output_only);
+GetOptions("count=i" => \$artists_to_count, "debug" => \$debug, "draft" => \$draft, "outputonly" => \$output_only);
 
 my $config = Config::Tiny->read('lastweekly.conf') || die "Could not read lastweekly.conf - $!\n";
 
@@ -83,6 +83,8 @@ $downstream_post_string .= ' [via <a href="https://github.com/kevinspencer/lastw
 $downstream_post_string = encode_utf8($downstream_post_string);
 
 print $downstream_post_string, "\n" if ($debug);
+
+exit() if ($output_only);
 
 my @posttags = qw(last.fm microblog);
 my $wpproxy  = $config->{wordpress}->{proxy};
