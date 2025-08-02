@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Copyright 2018-2024 Kevin Spencer <kevin@kevinspencer.org>
+# Copyright 2018-2025 Kevin Spencer <kevin@kevinspencer.org>
 #
 # Permission to use, copy, modify, distribute, and sell this software and its
 # documentation for any purpose is hereby granted without fee, provided that
@@ -27,14 +27,15 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 $Data::Dumper::Indent = 1;
 
 my ($artists_to_count, $draft, $debug, $output_only);
 GetOptions("count=i" => \$artists_to_count, "debug" => \$debug, "draft" => \$draft, "outputonly" => \$output_only);
 
-my $config = Config::Tiny->read('lastweekly.conf') || die "Could not read lastweekly.conf - $!\n";
+my $config = Config::Tiny->read('lastweekly.conf');
+die "Could not read lastweekly.conf: $Config::Tiny::errstr\n" unless $config;
 
 $artists_to_count ||= 5;
 
@@ -61,24 +62,25 @@ if ($data->{error}) {
     die "ERROR $data->{error}: $data->{message}\n";
 }
 
-my $artists = $data->{topartists}{artist};
-
-my $downstream_post_string = '<a href="https://www.last.fm/user/kevinspencer">Who did I listen to most this week?</a>  #lastfm says: ';
+my $artists = $data->{topartists}{artist} or die "Unexpected API response format (missing artists).\n";
 
 my $counter = 0;
+my $artist_string;
 for my $artist (@$artists) {
     if ($counter == 0) {
-        $downstream_post_string .= "$artist->{name} ($artist->{playcount})";
+        $artist_string .= "$artist->{name} ($artist->{playcount})";
     } elsif ($counter == ($artists_to_count - 1)) {
-        $downstream_post_string .= " & $artist->{name} ($artist->{playcount})";
+        $artist_string .= " & $artist->{name} ($artist->{playcount})";
     } else {
-        $downstream_post_string .= ", $artist->{name} ($artist->{playcount})";
+        $artist_string .= ", $artist->{name} ($artist->{playcount})";
     }
     $counter++;
     last if ($counter == $artists_to_count);
 }
 
-$downstream_post_string .= ' [via <a href="https://github.com/kevinspencer/lastweekly">lastweekly</a>]';
+my $downstream_post_string = qq{
+<a href="https://www.last.fm/user/kevinspencer">Who did I listen to most this week?</a>  #lastfm says: $artist_string [via <a href="https://github.com/kevinspencer/lastweekly">lastweekly</a>]
+};
 
 $downstream_post_string = encode_utf8($downstream_post_string);
 
@@ -95,12 +97,16 @@ my $wpcall   = 'metaWeblog.newPost';
 
 my $status = $draft ? 'draft' : 'publish';
 
-my $res = XMLRPC::Lite->proxy($wpproxy)->call($wpcall, $blogid, $wpuser, $wppass,
+my $rpc = XMLRPC::Lite->proxy($wpproxy)->call($wpcall, $blogid, $wpuser, $wppass,
     {
         description       => $downstream_post_string,
         title             => '',
         post_status       => $status,
         mt_allow_comments => 1,
         mt_keywords       => \@posttags,
-    }, 1)->result();
+    }, 1);
+
+die "XML-RPC Fault: " . $rpc->faultstring . "\n" if ($rpc->fault());
+
+print $rpc->result(), "\n" if ($debug);
 
