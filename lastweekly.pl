@@ -27,15 +27,24 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 $Data::Dumper::Indent = 1;
 
-my ($artists_to_count, $draft, $debug, $output_only);
-GetOptions("count=i" => \$artists_to_count, "debug" => \$debug, "draft" => \$draft, "outputonly" => \$output_only);
+my $config_file = 'lastweekly.conf';
 
-my $config = Config::Tiny->read('lastweekly.conf');
-die "Could not read lastweekly.conf: $Config::Tiny::errstr\n" unless $config;
+my ($artists_to_count, $draft, $debug, $output_only);
+
+GetOptions(
+    "count=i"     => \$artists_to_count,
+    "debug"       => \$debug,
+    "draft"       => \$draft,
+    "outputonly"  => \$output_only,
+    "config=s"    => \$config_file,
+);
+
+my $config = Config::Tiny->read($config_file);
+die "Could not read $config_file: $Config::Tiny::errstr\n" unless $config;
 
 $artists_to_count ||= 5;
 
