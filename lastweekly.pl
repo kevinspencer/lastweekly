@@ -27,7 +27,7 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 $Data::Dumper::Indent = 1;
 
@@ -48,7 +48,7 @@ die "Could not read $config_file: $Config::Tiny::errstr\n" unless $config;
 
 $artists_to_count ||= 5;
 
-my $api_url = 'http://ws.audioscrobbler.com/2.0/';
+my $api_url = 'https://ws.audioscrobbler.com/2.0/';
 my $uri = URI->new($api_url);
 my %params = (
     api_key => $config->{lastfm}->{apikey},
