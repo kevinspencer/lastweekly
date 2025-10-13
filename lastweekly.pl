@@ -27,7 +27,7 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 $Data::Dumper::Indent = 1;
 
@@ -73,19 +73,8 @@ if ($data->{error}) {
 
 my $artists = $data->{topartists}{artist} or die "Unexpected API response format (missing artists).\n";
 
-my $counter = 0;
-my $artist_string;
-for my $artist (@$artists) {
-    if ($counter == 0) {
-        $artist_string .= "$artist->{name} ($artist->{playcount})";
-    } elsif ($counter == ($artists_to_count - 1)) {
-        $artist_string .= " & $artist->{name} ($artist->{playcount})";
-    } else {
-        $artist_string .= ", $artist->{name} ($artist->{playcount})";
-    }
-    $counter++;
-    last if ($counter == $artists_to_count);
-}
+my @top = map { "$_->{name} ($_->{playcount})" } @$artists[0 .. $artists_to_count - 1];
+my $artist_string = join(', ', @top[0 .. $#top - 1]) . ", and $top[-1]";
 
 my $downstream_post_string = qq{
 <a href="https://www.last.fm/user/kevinspencer">Who did I listen to most this week?</a>  #lastfm says: $artist_string [via <a href="https://github.com/kevinspencer/lastweekly">lastweekly</a>]
