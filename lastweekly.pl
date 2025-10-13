@@ -27,7 +27,7 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 $Data::Dumper::Indent = 1;
 
@@ -72,6 +72,7 @@ if ($data->{error}) {
 }
 
 my $artists = $data->{topartists}{artist} or die "Unexpected API response format (missing artists).\n";
+$artists = [$artists] if ref($artists) eq 'HASH';
 
 my @top = map { "$_->{name} ($_->{playcount})" } @$artists[0 .. $artists_to_count - 1];
 my $artist_string = join(', ', @top[0 .. $#top - 1]) . ", and $top[-1]";
