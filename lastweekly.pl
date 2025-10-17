@@ -61,7 +61,7 @@ my %params = (
 $uri->query_form(%params);
 
 my $ua = LWP::UserAgent->new();
-$ua->agent('lastweekly.pl/' . $VERSION);
+$ua->agent($config->{lastfm}{useragent} . '/' . $VERSION);
 my $response = $ua->get($uri);
 if (! $response->is_success()) {
     die "Error when communicating with $api_url: " . $response->status_line(), "\n";
