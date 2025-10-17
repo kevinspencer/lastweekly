@@ -27,7 +27,7 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 $Data::Dumper::Indent = 1;
 
@@ -104,7 +104,7 @@ my $rpc = XMLRPC::Lite->proxy($wpproxy)->call($wpcall, $blogid, $wpuser, $wppass
         mt_keywords       => \@posttags,
     }, 1);
 
-die "XML-RPC Fault: " . $rpc->faultstring . "\n" if ($rpc->fault());
+die sprintf("XML-RPC Fault (%s): %s\n", $rpc->faultcode, $rpc->faultstring) if ($rpc->fault);
 
 print $rpc->result(), "\n";
 
