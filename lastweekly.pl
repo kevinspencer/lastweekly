@@ -27,17 +27,16 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 $Data::Dumper::Indent = 1;
 
 my $config_file = 'lastweekly.conf';
 
-my ($artists_to_count, $draft, $debug, $output_only);
+my ($artists_to_count, $draft, $output_only);
 
 GetOptions(
     "count=i"     => \$artists_to_count,
-    "debug"       => \$debug,
     "draft"       => \$draft,
     "outputonly"  => \$output_only,
     "config=s"    => \$config_file,
@@ -83,7 +82,7 @@ my $downstream_post_string = qq{
 
 $downstream_post_string = encode_utf8($downstream_post_string);
 
-print $downstream_post_string, "\n" if ($debug);
+print $downstream_post_string, "\n";
 
 exit() if ($output_only);
 
@@ -107,5 +106,5 @@ my $rpc = XMLRPC::Lite->proxy($wpproxy)->call($wpcall, $blogid, $wpuser, $wppass
 
 die "XML-RPC Fault: " . $rpc->faultstring . "\n" if ($rpc->fault());
 
-print $rpc->result(), "\n" if ($debug);
+print $rpc->result(), "\n";
 
