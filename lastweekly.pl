@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Copyright 2018-2025 Kevin Spencer <kevin@kevinspencer.org>
+# Copyright 2018-2026 Kevin Spencer <kevin@kevinspencer.org>
 #
 # Permission to use, copy, modify, distribute, and sell this software and its
 # documentation for any purpose is hereby granted without fee, provided that
@@ -16,20 +16,18 @@
 ################################################################################
 
 use Config::Tiny;
-use Data::Dumper;
-use Encode;
+use Encode qw(encode_utf8);
 use Getopt::Long;
 use JSON::XS;
 use LWP::UserAgent;
+use open qw(:std :utf8);
 use URI;
 use XMLRPC::Lite;
 use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
-
-$Data::Dumper::Indent = 1;
+our $VERSION = '0.28';
 
 my $config_file = 'lastweekly.conf';
 
@@ -42,10 +40,16 @@ GetOptions(
     "config=s"    => \$config_file,
 );
 
-# FIXME: sanity check config entries
-
 my $config = Config::Tiny->read($config_file);
 die "Could not read $config_file: $Config::Tiny::errstr\n" unless $config;
+
+for my $key (qw(apiurl apikey user useragent)) {
+    die "Missing lastfm.$key in config\n" if (! defined $config->{lastfm}{$key});
+}
+
+for my $key (qw(proxy user pass)) {
+    die "Missing wordpress.$key in config\n" if (! defined $config->{wordpress}{$key});
+}
 
 $artists_to_count ||= 5;
 
