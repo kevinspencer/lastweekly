@@ -27,7 +27,7 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 my $config_file = 'lastweekly.conf';
 
@@ -79,8 +79,15 @@ if ($data->{error}) {
 my $artists = $data->{topartists}{artist} or die "Unexpected API response format (missing artists).\n";
 $artists = [$artists] if ref($artists) eq 'HASH';
 
-my @top = map { "$_->{name} ($_->{playcount})" } @$artists[0 .. $artists_to_count - 1];
-my $artist_string = join(', ', @top[0 .. $#top - 1]) . ", and $top[-1]";
+my $limit = @$artists < $artists_to_count ? @$artists : $artists_to_count;
+my @top   = map { "$_->{name} ($_->{playcount})" } @$artists[0 .. $limit - 1];
+
+my $artist_string =
+    @top == 1 ? $top[0]
+  : @top == 2 ? join(' and ', @top)
+  : join(', ', @top[0 .. $#top - 1]) . ", and $top[-1]";
+
+  #my $artist_string = join(', ', @top[0 .. $#top - 1]) . ", and $top[-1]";
 
 my $downstream_post_string = qq{
 <a href="https://www.last.fm/user/kevinspencer">Who did I listen to most this week?</a>  #lastfm says: $artist_string [via <a href="https://github.com/kevinspencer/lastweekly">lastweekly</a>]
