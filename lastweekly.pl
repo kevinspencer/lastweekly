@@ -27,7 +27,7 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 my $config_file = 'lastweekly.conf';
 
@@ -64,14 +64,23 @@ my %params = (
 );
 $uri->query_form(%params);
 
-my $ua = LWP::UserAgent->new();
-$ua->agent($config->{lastfm}{useragent} . '/' . $VERSION);
+my $ua = LWP::UserAgent->new(
+    timeout => 15,
+    agent   => $config->{lastfm}{useragent} . '/' . $VERSION,
+);
 my $response = $ua->get($uri);
 if (! $response->is_success()) {
     die "Error when communicating with $api_url: " . $response->status_line(), "\n";
 }
 
-my $data = decode_json($response->content());
+my $data;
+
+eval { 
+    $data = decode_json($response->content());
+};
+
+die "Invalid JSON from Last.fm\n" if $@;
+
 if ($data->{error}) {
     die "ERROR $data->{error}: $data->{message}\n";
 }
@@ -86,8 +95,6 @@ my $artist_string =
     @top == 1 ? $top[0]
   : @top == 2 ? join(' and ', @top)
   : join(', ', @top[0 .. $#top - 1]) . ", and $top[-1]";
-
-  #my $artist_string = join(', ', @top[0 .. $#top - 1]) . ", and $top[-1]";
 
 my $downstream_post_string = qq{
 <a href="https://www.last.fm/user/kevinspencer">Who did I listen to most this week?</a>  #lastfm says: $artist_string [via <a href="https://github.com/kevinspencer/lastweekly">lastweekly</a>]
