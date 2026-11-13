@@ -211,8 +211,8 @@ sub build_post_html {
                . qq{<td width="$image_size" style="width:${image_size}px;padding:6px 14px 6px 0;vertical-align:middle;border:0;">$img</td>}
                . qq{<td style="padding:6px 0;vertical-align:middle;border:0;">}
                . qq{<table width="100%" style="width:100%;border-collapse:collapse;margin:0;"><tr>}
-               . qq{<td style="padding:0;line-height:1.3;border:0;">$rank. $name</td>}
-               . qq{<td style="padding:0 0 0 14px;line-height:1.3;text-align:right;white-space:nowrap;border:0;">$plays</td>}
+               . qq{<td style="padding:0;font-size:0.9em;line-height:1.3;border:0;">$rank. $name</td>}
+               . qq{<td style="padding:0 0 0 14px;font-size:0.9em;line-height:1.3;text-align:right;white-space:nowrap;border:0;">$plays</td>}
                . qq{</tr></table>}
                . qq{<div style="margin-top:5px;height:8px;border-radius:4px;background:rgba(136,136,136,0.18);">}
                . qq{<div style="width:$pct%;height:8px;border-radius:4px;background:$bar_color;"></div></div>}
